@@ -6,7 +6,6 @@ from map import Map
 move_rate = 0.15
 
 
-
 if __name__ == '__main__':
 
     file_path = "map.csv"
@@ -69,8 +68,6 @@ if __name__ == '__main__':
 
         my_map.draw()
         time.sleep(move_rate)
-        
-        
     
         counter = 0
         for bot in bots:

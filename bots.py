@@ -25,31 +25,22 @@ class Bot():
         self.find_optimal_path(self.pickup_location)
 
 
+
     def move_to_next_spot(self):
         
-    
-        self.current_location = self.optimal_path[self.optimal_path_index]
-        print(self.optimal_path)
-
         # If the bot has reached it's destination
-        if len(self.optimal_path) == self.optimal_path_index+1:
-            
-            # print("HERE!", self.optimal_path_index, len(self.optimal_path))
+        if len(self.optimal_path)-1 == self.optimal_path_index:
 
-            self.optimal_path_index = -1
+            self.optimal_path_index = 0
 
             # If it was going to pickup location, then go to the drop off location
             if self.is_going_to_pickup:
                 self.is_going_to_pickup = False
                 self.is_going_to_dropoff = True
-                print(self.optimal_path)
-                self.find_optimal_path([self.dropoff_location[1],self.dropoff_location[0]])
-                
-                #self.optimal_path = self.optimal_path[::-1]
-                print(self.optimal_path)
+                self.find_optimal_path(self.dropoff_location)
 
             # If it was going to droppff location
-            if self.is_going_to_dropoff:
+            elif self.is_going_to_dropoff:
                 
                 # If there is nothing left to pickup, go back to starting spot
                 if self.resource_pickup_count == 0:
@@ -61,15 +52,19 @@ class Bot():
                 else:
                     self.is_going_to_dropoff = False
                     self.is_going_to_pickup = True
-                    self.find_optimal_path(self.pickup_location)
+                    # Just reverse the path so we don't need to any additional computation
+                    self.optimal_path = self.optimal_path[::-1]
 
             # If the bot has reached it's starting spot after delivering all the items, then it's done working
             # (for now anyways)
-            if self.is_going_to_start:
+            elif self.is_going_to_start:
                 self.is_going_to_start = False
                 self.optimal_path_index -= 1
         
-        self.optimal_path_index += 1
+        else:
+            self.optimal_path_index += 1
+        
+        self.current_location = self.optimal_path[self.optimal_path_index]
 
 
     # ~~~ The star of the show ;) ~~~
@@ -80,7 +75,7 @@ class Bot():
         #num_squares_explored = 0
 
         frontier = []
-        start_square = Square_Node( [self.current_location[1],self.current_location[0]])
+        start_square = Square_Node(self.current_location)
         frontier.append(start_square)
 
         # While A* search is being performed
@@ -123,16 +118,13 @@ class Bot():
             curr_node = curr_node.prev
         self.optimal_path = optimal_path_list[::-1]
         
-
         #return [optimal_path, optimal_path_cost, num_squares_explored]
 
 
 
 
-
-
     # ~~~ Helper Functions ~~~
-
+    
     # Checks if the position given is on the grid
     def is_position_valid(self, position, grid):
         return ((position[0] < len(grid) and position[0] >= 0)
