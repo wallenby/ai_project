@@ -42,6 +42,8 @@ class Bot():
             # If it was going to droppff location
             elif self.is_going_to_dropoff:
                 
+                self.resource_pickup_count -= 1
+                
                 # If there is nothing left to pickup, go back to starting spot
                 if self.resource_pickup_count == 0:
                     self.is_going_to_dropoff = False
@@ -58,8 +60,8 @@ class Bot():
             # If the bot has reached it's starting spot after delivering all the items, then it's done working
             # (for now anyways)
             elif self.is_going_to_start:
-                self.is_going_to_start = False
                 self.optimal_path_index -= 1
+                self.optimal_path = [self.start_location]
         
         else:
             self.optimal_path_index += 1
