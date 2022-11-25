@@ -67,8 +67,90 @@ class Bot():
             self.optimal_path_index += 1
         
         self.current_location = self.optimal_path[self.optimal_path_index]
+        
+            
+
+    # ~~~ Helper Functions ~~~
+    
+    # Checks if the position given is on the grid
+    def is_position_valid(self, position):
+        return ((position[0] < len(self.grid) and position[0] >= 0)
+                and (position[1] < len(self.grid[0]) and position[1] >= 0)
+                and (self.grid[position[0]][position[1]] != 'X'))
 
 
+    # Checks if the position given is on the grid
+    def is_position_occupied(self, position):
+        return (self.grid[position[0]][position[1]] != ' ' and self.grid[position[0]][position[1]] != 'P'
+                and self.grid[position[0]][position[1]] != 'D' and self.grid[position[0]][position[1]] != 'S')
+        
+        
+    # Checks if the position given is occupied by another bot
+    def is_bot_on_location(self, bots):
+        
+        for bot in bots:
+            if not bot.symbol == self.symbol and ((bot.next_spot() == self.current_location and bot.current_location == self.next_spot()) or
+                (bot.current_location == self.next_spot() and bot.current_location == bot.next_spot())):
+                # print(self.symbol, "looks like it's occupied, buster")
+                return True
+        
+        return False
+                
+
+    # returns the spot the bot is going to travel to next
+    # if it's just idling, then it'll just return it's current position
+    def next_spot(self):
+        if len(self.optimal_path) != self.optimal_path_index+1:
+            return self.optimal_path[self.optimal_path_index+1]
+        else:
+            return self.current_location
+        
+        
+        
+    def look_for_better_spot(self):
+        
+        # print("BEEP BEEP, LOOKING FOR BETTER SPOT!")
+        
+        # ADJACENT - RIGHT
+        if ( self.is_position_valid([self.current_location[0], self.current_location[1] + 1]) and
+        not self.is_position_occupied([self.current_location[0], self.current_location[1] + 1]) and 
+        [self.current_location[0], self.current_location[1] + 1] != self.next_spot()):
+            
+            self.current_location = [self.current_location[0], self.current_location[1] + 1]
+                
+        # ADJACENT - DOWN
+        elif ( self.is_position_valid([self.current_location[0] + 1, self.current_location[1]]) and
+        (not self.is_position_occupied([self.current_location[0] + 1, self.current_location[1]])) and 
+       [self.current_location[0] + 1, self.current_location[1]] != self.next_spot()):
+            self.current_location = [self.current_location[0] + 1, self.current_location[1]]
+
+        # ADJACENT - UP
+        elif ( self.is_position_valid([self.current_location[0] - 1, self.current_location[1]]) and
+        not self.is_position_occupied([self.current_location[0] - 1, self.current_location[1]]) and 
+        [self.current_location[0] - 1, self.current_location[1]] != self.next_spot()):
+            self.current_location = [ self.current_location[0] - 1, self.current_location[1]]
+
+        # ADJACENT - LEFT 
+        elif ( self.is_position_valid([self.current_location[0], self.current_location[1]-1]) and 
+        not self.is_position_occupied([ self.current_location[0], self.current_location[1] - 1]) and 
+        [self.current_location[0], self.current_location[1]-1] != self.next_spot()):
+            self.current_location = [ self.current_location[0], self.current_location[1] - 1]
+            
+        else:
+            self.optimal_path_index += 1
+        
+        if self.optimal_path_index < 0:
+            self.optimal_path_index -= 1
+        
+            
+            
+            
+            
+            
+            
+            
+            
+            
     # ~~~ The star of the show ;) ~~~
     def find_optimal_path(self, destination):
 
@@ -97,19 +179,20 @@ class Bot():
             # Checking adjacent squares...
             # ADJACENT - RIGHT
             temp_position = [min_f.position[0], min_f.position[1] + 1]
-            self.explore_sqaure(temp_position, self.grid, min_f, frontier)
+            self.explore_sqaure(temp_position, min_f, frontier)
 
             # ADJACENT - DOWN
             temp_position = [min_f.position[0] + 1, min_f.position[1]]
-            self.explore_sqaure(temp_position, self.grid, min_f, frontier)
+            self.explore_sqaure(temp_position, min_f, frontier)
 
             # ADJACENT - UP
             temp_position = [min_f.position[0] - 1, min_f.position[1]]
-            self.explore_sqaure(temp_position, self.grid, min_f, frontier)
+            self.explore_sqaure(temp_position, min_f, frontier)
 
             # ADJACENT - LEFT
             temp_position = [min_f.position[0], min_f.position[1] - 1]
-            self.explore_sqaure(temp_position, self.grid, min_f, frontier)
+            self.explore_sqaure(temp_position, min_f, frontier)
+
 
         curr_node = min_f
         optimal_path_cost = -1
@@ -123,22 +206,16 @@ class Bot():
         #return [optimal_path, optimal_path_cost, num_squares_explored]
 
 
-
-
-    # ~~~ Helper Functions ~~~
+    # ~~~ Helper Functions - Related to optimal path finding algorithm ~~~
     
-    # Checks if the position given is on the grid
-    def is_position_valid(self, position, grid):
-        return ((position[0] < len(grid) and position[0] >= 0)
-                and (position[1] < len(grid[0]) and position[1] >= 0)
-                and (grid[position[0]][position[1]] != 'X'))
-
-        # Checks if the position given is on the grid
-    def is_position_occupied(self, position, grid):
-        return (grid[position[0]][position[1]] != ' ' and grid[position[0]][position[1]] != 'P'
-                and grid[position[0]][position[1]] != 'D' and grid[position[0]][position[1]] != 'S')
-
-    # Checks if the square has been explored (position and coming from the same square)
+    # Checks if the square should be explored -> if it should, it checks it by adding
+    # it to the frontier
+    def explore_sqaure(self, new_position, min_f, frontier):
+        if (self.is_position_valid(new_position) and not self.is_square_explored(min_f, new_position)):
+            new_square = Square_Node(new_position, min_f)
+            bisect.insort(frontier, new_square)
+            
+   # Checks if the square has been explored (position and coming from the same square)
     def is_square_explored(self, curr_node, position):
         temp_node = curr_node
 
@@ -148,10 +225,3 @@ class Bot():
             if (temp_node.prev is None):
                 return False
             temp_node = temp_node.prev
-
-    # Checks if the square should be explored -> if it should, it checks it by adding
-    # it to the frontier
-    def explore_sqaure(self, new_position, grid, min_f, frontier):
-        if (self.is_position_valid(new_position, grid) and not self.is_square_explored(min_f, new_position)):
-            new_square = Square_Node(new_position, min_f)
-            bisect.insort(frontier, new_square)

@@ -14,17 +14,17 @@ if __name__ == '__main__':
 
 
     bot1 = Bot([0,0], [8,1], [1,9], my_map.grid, 'c')
-    bot2 = Bot([0,1], [8,4], [1,9], my_map.grid, 'o')
-    bot1.resource_pickup_count = 2
-    bot2.resource_pickup_count = 3
-    #bot3 = Bot([0,2], [8,7], [1,9], my_map.grid)
-    bots = [bot1, bot2]
+    bot2 = Bot([1,0], [8,4], [1,9], my_map.grid, 'o')
+    bot3 = Bot([2,0], [8,7], [1,9], my_map.grid, 'h')
     
-
-    #bot3.resource_pickup_count = 5
+    bots = [bot1, bot2, bot3]
     
+    bot1.resource_pickup_count = 3
+    bot2.resource_pickup_count = 5
+    bot3.resource_pickup_count = 1
     
-    
+    my_map.draw()
+    time.sleep(move_rate)
     
     while(True):
         
@@ -34,10 +34,18 @@ if __name__ == '__main__':
         
         for bot in bots:
             
-            bot.move_to_next_spot()
-        
-            characters_replaced.append(my_map.grid[bot.current_location[0]][bot.current_location[1]])      
+            # Collision Avoidance!
+            # If there ISN'T a bot in the next spot, move there!
+            if not bot.is_bot_on_location(bots):
+                bot.move_to_next_spot()
+            # else if it IS occupied, then...
                 
+            else:
+                bot.look_for_better_spot()
+                
+            #print(bot.symbol , "at", bot.current_location)  
+            
+            characters_replaced.append(my_map.grid[bot.current_location[0]][bot.current_location[1]])      
             my_map.grid[bot.current_location[0]][bot.current_location[1]] = bot.symbol
 
         my_map.draw()
@@ -47,4 +55,14 @@ if __name__ == '__main__':
         for bot in bots:
             my_map.grid[bot.current_location[0]][bot.current_location[1]] = characters_replaced[counter]
             counter += 1
+            
+        counter = 0
+        for bot in bots:
+            if bot.resource_pickup_count == 0:
+                counter += 1
+        
+        if len(bots) == counter:
+            print("ALL DONE!")
+            break
+            
     

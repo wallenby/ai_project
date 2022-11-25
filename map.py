@@ -15,12 +15,7 @@ class Map():
                 grid_row = []
                 for column in row:
                     grid_row.append(column)
-                #grid_row = grid_row[::-1]
                 self.grid.append(grid_row)
-        # Rotating grid so code uses [x][y] cordinates    
-        temp_row =        0     
-        #self.grid = self.grid[::-1]
-        print (self.grid)
                 
     def draw(self):
         print(self.grid[9][1])
