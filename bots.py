@@ -79,8 +79,7 @@ class Bot():
         
         
         
-        
-            
+
 
     # ~~~ Helper Functions ~~~
     
@@ -95,28 +94,6 @@ class Bot():
     def is_position_occupied(self, position):
         return (self.grid[position[0]][position[1]] != ' ' and self.grid[position[0]][position[1]] != 'P'
                 and self.grid[position[0]][position[1]] != 'D' and self.grid[position[0]][position[1]] != 'S')
-        
-        
-    # # Checks if the position given is occupied by another bot
-    # def is_bot_on_location(self, bots):
-        
-    #     for bot in bots:
-    #         if not bot.symbol == self.symbol and ((bot.next_spot() == self.current_location and bot.current_location == self.next_spot()) or
-    #             (bot.current_location == self.next_spot() and bot.current_location == bot.next_spot())):
-    #             print(self.symbol, "looks like it's occupied, buster")
-    #             return True
-        
-    #     return False
-                
-
-    # returns the spot the bot is going to travel to next
-    # if it's just idling, then it'll just return it's current position
-    # def next_spot(self):
-    #     if len(self.optimal_path) != self.optimal_path_index+1:
-    #         return self.optimal_path[self.optimal_path_index+1]
-    #     else:
-    #         return self.current_location
-        
         
         
     def look_for_better_spot(self):
@@ -161,10 +138,6 @@ class Bot():
     # ~~~ The star of the show ;) ~~~
     def find_optimal_path(self, destination):
 
-        optimal_path = 0
-        optimal_path_cost = 0
-        #num_squares_explored = 0
-
         frontier = []
         start_square = Square_Node(self.current_location)
         frontier.append(start_square)
@@ -203,15 +176,12 @@ class Bot():
 
 
         curr_node = min_f
-        optimal_path_cost = -1
         optimal_path_list = []
         while (curr_node != None):
-            #optimal_path_cost += 1
             optimal_path_list.append([curr_node.position[0], curr_node.position[1]])
             curr_node = curr_node.prev
         self.optimal_path = optimal_path_list[::-1]
         
-        #return [optimal_path, optimal_path_cost, num_squares_explored]
 
 
     # ~~~ Helper Functions - Related to optimal path finding algorithm ~~~
@@ -244,18 +214,27 @@ class Bot():
         while temp_node != None:
             temp_node = temp_node.prev
             counter += 1
-            
+        
+        # counter +=1
         for bot in self.bots:
             
+            
+            # if self != bot and (len(bot.optimal_path)) > bot.optimal_path_index + counter:
+            #     return new_position == bot.optimal_path[bot.optimal_path_index+counter] or current_node.position == bot.optimal_path[bot.optimal_path_index+counter-1]
+            
             # if some other bot is on the same location as the square being explored and at the sime time
-            if self != bot and (len(bot.optimal_path) - bot.optimal_path_index) > counter :
+            if self != bot and (len(bot.optimal_path) - bot.optimal_path_index) >= counter :
                 
-                return new_position == bot.optimal_path[counter + bot.optimal_path_index-1]
+                return new_position == bot.optimal_path[counter + bot.optimal_path_index-1] 
             
-            if self != bot and (len(bot.optimal_path) - bot.optimal_path_index) > counter :
-                return new_position == bot.optimal_path[counter + bot.optimal_path_index-2]
             
-            # or new_position == bot.optimal_path[bot.optimal_path_index-1]
+            # and current_node.position == bot.optimal_path[bot.optimal_path_index+counter-1]
+            
+            # elif self != bot and (len(bot.optimal_path) - bot.optimal_path_index) >= counter :
+            #     return current_node.position == bot.optimal_path[bot.optimal_path_index+counter-1]
+            
+
+            
             
         return False
                  

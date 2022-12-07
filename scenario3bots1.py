@@ -8,14 +8,14 @@ move_rate = 0.2
 
 if __name__ == '__main__':
 
-    file_path = "map2.csv"
+    file_path = "map3bots1.csv"
     my_map = Map()
     my_map.get_grid(file_path)
 
 
-    bot1 = Bot([2,0], [6,1], [0,3], my_map.grid, '1')
-    bot2 = Bot([0,7], [8,4], [0,3], my_map.grid, '2')
-    bot3 = Bot([1,9], [5,7], [0,3], my_map.grid, '3')
+    bot1 = Bot([0,0], [8,1], [1,9], my_map.grid, '1')
+    bot2 = Bot([1,0], [8,4], [1,9], my_map.grid, '2')
+    bot3 = Bot([2,0], [8,7], [1,9], my_map.grid, '3')
     
     bots = [bot1, bot2, bot3]
     
@@ -44,6 +44,7 @@ if __name__ == '__main__':
             
             characters_replaced.append(my_map.grid[bot.current_location[0]][bot.current_location[1]])      
             my_map.grid[bot.current_location[0]][bot.current_location[1]] = bot.symbol
+            print("bot #", bot.symbol, " -> drop-offs left: ", bot.resource_pickup_count)
 
         my_map.draw()
         time.sleep(move_rate)
@@ -57,7 +58,6 @@ if __name__ == '__main__':
         for bot in bots:
             if bot.resource_pickup_count == 0 and bot.current_location == bot.start_location:
                 counter += 1
-            print("bot #", bot.symbol, " -> drop-offs left: ", bot.resource_pickup_count)
         
         if len(bots) == counter:
             print("ALL DONE!")
