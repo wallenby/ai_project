@@ -16,6 +16,7 @@ class Map():
                 for column in row:
                     grid_row.append(column)
                 self.grid.append(grid_row)
+     
                 
     def draw(self):
         print(self.grid[9][1])

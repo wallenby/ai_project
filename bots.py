@@ -2,6 +2,9 @@ import bisect
 from map import Map, Square_Node
 
 class Bot():
+    
+
+    
     def __init__(self, starting_location, pickup_location, dropoff_location, grid, symbol):
         self.current_location = self.start_location = starting_location
         self.pickup_location = pickup_location
@@ -22,16 +25,20 @@ class Bot():
         # Number of resources bot needs to pickup and deliver to the drop-off destination
         self.resource_pickup_count = 0
         
-        self.find_optimal_path(self.pickup_location)
-
+        
+    def set_bots(self, bots):
+        self.bots = bots
+    
+    
 
 
     def move_to_next_spot(self):
         
+        
         # If the bot has reached it's destination
         if len(self.optimal_path)-1 == self.optimal_path_index:
 
-            self.optimal_path_index = 0
+            self.optimal_path_index = 1
 
             # If it was going to pickup location, then go to the drop off location
             if self.is_going_to_pickup:
@@ -66,7 +73,12 @@ class Bot():
         else:
             self.optimal_path_index += 1
         
-        self.current_location = self.optimal_path[self.optimal_path_index]
+        
+        if self.optimal_path_index < len(self.optimal_path):
+            self.current_location = self.optimal_path[self.optimal_path_index]
+        
+        
+        
         
             
 
@@ -85,25 +97,25 @@ class Bot():
                 and self.grid[position[0]][position[1]] != 'D' and self.grid[position[0]][position[1]] != 'S')
         
         
-    # Checks if the position given is occupied by another bot
-    def is_bot_on_location(self, bots):
+    # # Checks if the position given is occupied by another bot
+    # def is_bot_on_location(self, bots):
         
-        for bot in bots:
-            if not bot.symbol == self.symbol and ((bot.next_spot() == self.current_location and bot.current_location == self.next_spot()) or
-                (bot.current_location == self.next_spot() and bot.current_location == bot.next_spot())):
-                # print(self.symbol, "looks like it's occupied, buster")
-                return True
+    #     for bot in bots:
+    #         if not bot.symbol == self.symbol and ((bot.next_spot() == self.current_location and bot.current_location == self.next_spot()) or
+    #             (bot.current_location == self.next_spot() and bot.current_location == bot.next_spot())):
+    #             print(self.symbol, "looks like it's occupied, buster")
+    #             return True
         
-        return False
+    #     return False
                 
 
     # returns the spot the bot is going to travel to next
     # if it's just idling, then it'll just return it's current position
-    def next_spot(self):
-        if len(self.optimal_path) != self.optimal_path_index+1:
-            return self.optimal_path[self.optimal_path_index+1]
-        else:
-            return self.current_location
+    # def next_spot(self):
+    #     if len(self.optimal_path) != self.optimal_path_index+1:
+    #         return self.optimal_path[self.optimal_path_index+1]
+    #     else:
+    #         return self.current_location
         
         
         
@@ -146,11 +158,6 @@ class Bot():
             
             
             
-            
-            
-            
-            
-            
     # ~~~ The star of the show ;) ~~~
     def find_optimal_path(self, destination):
 
@@ -175,6 +182,7 @@ class Bot():
 
             # Done exploring current square, remove it from the frontier
             frontier.remove(min_f)
+            
 
             # Checking adjacent squares...
             # ADJACENT - RIGHT
@@ -210,18 +218,43 @@ class Bot():
     
     # Checks if the square should be explored -> if it should, it checks it by adding
     # it to the frontier
-    def explore_sqaure(self, new_position, min_f, frontier):
-        if (self.is_position_valid(new_position) and not self.is_square_explored(min_f, new_position)):
-            new_square = Square_Node(new_position, min_f)
+    def explore_sqaure(self, new_position, current_node, frontier):
+        if (self.is_position_valid(new_position) and not self.is_square_explored(current_node, new_position) 
+            and not self.is_occupied(current_node, new_position) ):
+            new_square = Square_Node(new_position, current_node)
             bisect.insort(frontier, new_square)
             
    # Checks if the square has been explored (position and coming from the same square)
-    def is_square_explored(self, curr_node, position):
-        temp_node = curr_node
+    def is_square_explored(self, current_node, position):
+        temp_node = current_node
 
-        while (curr_node != None):
+        while (temp_node != None):
             if (temp_node.position == position):
                 return True
             if (temp_node.prev is None):
                 return False
             temp_node = temp_node.prev
+            
+            
+            
+    def is_occupied(self, current_node, new_position):
+        
+        counter = 0
+        temp_node = current_node
+        while temp_node != None:
+            temp_node = temp_node.prev
+            counter += 1
+            
+        for bot in self.bots:
+            
+            # if some other bot is on the same location as the square being explored and at the sime time
+            if self != bot and (len(bot.optimal_path) - bot.optimal_path_index-1) > counter :
+                
+                return new_position == bot.optimal_path[counter - (bot.optimal_path_index-1)]
+            
+            # elif self != bot and (bot.optimal_path_index == len(bot.optimal_path)-2 or bot.optimal_path_index == 1
+            #                       or bot.optimal_path_index == 0 or bot.optimal_path_index == len(bot.optimal_path)-1):
+                      
+            #     return new_position == bot.current_location 
+            # or new_position == bot.optimal_path[bot.optimal_path_index-1]
+                 
