@@ -74,8 +74,8 @@ class Bot():
             self.optimal_path_index += 1
         
         
-        if self.optimal_path_index < len(self.optimal_path):
-            self.current_location = self.optimal_path[self.optimal_path_index]
+        #if self.optimal_path_index < len(self.optimal_path):
+        self.current_location = self.optimal_path[self.optimal_path_index]
         
         
         
@@ -248,13 +248,14 @@ class Bot():
         for bot in self.bots:
             
             # if some other bot is on the same location as the square being explored and at the sime time
-            if self != bot and (len(bot.optimal_path) - bot.optimal_path_index-1) > counter :
+            if self != bot and (len(bot.optimal_path) - bot.optimal_path_index) > counter :
                 
-                return new_position == bot.optimal_path[counter - (bot.optimal_path_index-1)]
+                return new_position == bot.optimal_path[counter + bot.optimal_path_index-1]
             
-            # elif self != bot and (bot.optimal_path_index == len(bot.optimal_path)-2 or bot.optimal_path_index == 1
-            #                       or bot.optimal_path_index == 0 or bot.optimal_path_index == len(bot.optimal_path)-1):
-                      
-            #     return new_position == bot.current_location 
+            if self != bot and (len(bot.optimal_path) - bot.optimal_path_index) > counter :
+                return new_position == bot.optimal_path[counter + bot.optimal_path_index-2]
+            
             # or new_position == bot.optimal_path[bot.optimal_path_index-1]
+            
+        return False
                  

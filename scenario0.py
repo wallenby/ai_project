@@ -3,29 +3,28 @@ import time
 from bots import Bot
 from map import Map
 
-move_rate = 0.1
+move_rate = 0.3
 
 
 if __name__ == '__main__':
 
-    file_path = "map1.csv"
+    file_path = "map3.csv"
     my_map = Map()
     my_map.get_grid(file_path)
 
 
-    bot1 = Bot([0,0], [8,1], [1,9], my_map.grid, '1')
-    bot2 = Bot([1,0], [8,4], [1,9], my_map.grid, '2')
-    bot3 = Bot([2,0], [8,7], [1,9], my_map.grid, '3')
+    bot1 = Bot([1,0], [8,1], [1,7], my_map.grid, '1')
+    bot2 = Bot([2,0], [8,4], [1,7], my_map.grid, '2')
+
     
-    bots = [bot1, bot2, bot3]
+    bots = [bot1, bot2]
     
     for bot in bots:
         bot.bots = bots 
         bot.find_optimal_path(bot.pickup_location)
     
-    bot1.resource_pickup_count = 3
+    bot1.resource_pickup_count = 4
     bot2.resource_pickup_count = 5
-    bot3.resource_pickup_count = 1
     
     my_map.draw()
     time.sleep(move_rate)
@@ -57,7 +56,6 @@ if __name__ == '__main__':
         for bot in bots:
             if bot.resource_pickup_count == 0 and bot.current_location == bot.start_location:
                 counter += 1
-            print("bot #", bot.symbol, " -> drop-offs left: ", bot.resource_pickup_count)
         
         if len(bots) == counter:
             print("ALL DONE!")

@@ -3,7 +3,7 @@ import time
 from bots import Bot
 from map import Map
 
-move_rate = 0.3
+move_rate = 0.15
 
 
 if __name__ == '__main__':
@@ -13,8 +13,8 @@ if __name__ == '__main__':
     my_map.get_grid(file_path)
 
 
-    bot1 = Bot([1,0], [8,1], [1,7], my_map.grid, '1')
-    bot2 = Bot([2,0], [8,4], [1,7], my_map.grid, '2')
+    bot1 = Bot([1,0], [8,1], [0,7], my_map.grid, '1')
+    bot2 = Bot([2,0], [8,4], [0,7], my_map.grid, '2')
 
     
     bots = [bot1, bot2]
@@ -56,6 +56,7 @@ if __name__ == '__main__':
         for bot in bots:
             if bot.resource_pickup_count == 0 and bot.current_location == bot.start_location:
                 counter += 1
+            print("bot #", bot.symbol, " -> drop-offs left: ", bot.resource_pickup_count)
         
         if len(bots) == counter:
             print("ALL DONE!")

@@ -3,7 +3,7 @@ import time
 from bots import Bot
 from map import Map
 
-move_rate = 0.3
+move_rate = 0.2
 
 
 if __name__ == '__main__':
@@ -57,6 +57,7 @@ if __name__ == '__main__':
         for bot in bots:
             if bot.resource_pickup_count == 0 and bot.current_location == bot.start_location:
                 counter += 1
+            print("bot #", bot.symbol, " -> drop-offs left: ", bot.resource_pickup_count)
         
         if len(bots) == counter:
             print("ALL DONE!")
